@@ -24,81 +24,62 @@ function [result, fnc_compute_brightness, fnc_compute_chromaticity, fnc_gamma_co
 end
 
 function [brightness] = evc_compute_brightness(input)
-%evc_compute_brightness berechnet die Helligkeitswerte des Bildes input, 
-% das mit dem Kehrwert des maximalen Wertes der Farbkanäle normalisiert 
+% evc_compute_brightness berechnet die Helligkeitswerte des Bildes input,
+% das mit dem Kehrwert des maximalen Wertes der Farbkanäle normalisiert
 % wurde. Anschließend wird das Result wiederum mit dem maximalen Wert
 % multipliziert.
 %
 %   EINGABE
-%   input...        Bild
+%   input       Bild
 
 %   AUSGABE
-%   brightness...   Helligkeitswerte des Bildes
+%   brightness  Helligkeitswerte des Bildes
 
-    %NOTE: 	Die folgende Zeile kann gelöscht werden. Sie verhindert, 
-    %       dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-    %TODO:  Implementiere diese Funktion.
-
-    brightness = rgb2gray(input);
+    maximum = max(input(:));
+    brightness = rgb2gray(input / maximum) * maximum;
 end
 
 function [chromaticity] = evc_compute_chromaticity(input, brightness)
-%evc_compute_chromaticity berechnet die Chromatizität des Bildes input
+% evc_compute_chromaticity berechnet die Chromatizität des Bildes input
 % mithilfe dessen Helligkeitswerte in brightness. Dabei werden die
 % Farbkanäle des Inputbildes durch die Helligkeit dividiert.
 %
 %   EINGABE
-%   input...            Bild
-%   brightness...       Helligkeitswerte
+%   input         Bild
+%   brightness    Helligkeitswerte
 
 %   AUSGABE
-%   chromaticity...     Chromatizität des Bildes
+%   chromaticity  Chromatizität des Bildes
 
-    %NOTE: 	Die folgende Zeile kann gelöscht werden. Sie verhindert, 
-    %       dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-    %TODO:  Implementiere diese Funktion.
-    
-    chromaticity = input;
+    chromaticity = input ./ repmat(brightness, [1 1 3]);
 end
 
 function [corrected] = evc_gamma_correct(input, gamma)
-%evc_gamma_correct führt die Gammakorrektur auf das gegebene Bild input
+% evc_gamma_correct führt die Gammakorrektur auf das gegebene Bild input
 % aus. Dies wird durch einfaches Potenzieren mit dem Kehrtwert von Gamma
 % (gamma^-1) erreicht.
 %
 %   EINGABE
-%   input...        Bild
-%   gamma...        Gamma Wert
+%   input      Bild
+%   gamma      Gamma Wert
 
 %   AUSGABE
-%   corrected...    Gamma-korrigiertes Bild
+%   corrected  Gamma-korrigiertes Bild
 
-    %HINT:  Behandle eine mögliche Division durch 0!
-    %NOTE: 	Die folgende Zeile kann gelöscht werden. Sie verhindert, 
-    %       dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-    %TODO:  Implementiere diese Funktion.
-    
-    corrected = input;
+    gamma = max(gamma, 0.0000000001)^(-1);
+    corrected = input .^ gamma;
 end
 
 function [result] = evc_reconstruct(brightness_gamma, chromaticity)
-%evc_reconstruct rekonstruiert die Farbwerte durch Multiplikation der
-% korrigierten Helligkeitswerte mit der Chromatizität.
+% evc_reconstruct rekonstruiert die Farbwerte durch Multiplikation
+% der korrigierten Helligkeitswerte mit der Chromatizität.
 %
 %   EINGABE
-%   brightness_gamma...     Gamma-korrigierte Helligkeitswerte
-%   chromaticity...         Chromatizität
+%   brightness_gamma  Gamma-korrigierte Helligkeitswerte
+%   chromaticity      Chromatizität
 
 %   AUSGABE
-%   result...               Rekonstruiertes Bild
+%   result            Rekonstruiertes Bild
 
-    %NOTE: 	Die folgende Zeile kann gelöscht werden. Sie verhindert, 
-    %       dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-    %TODO:  Implementiere diese Funktion.
-    
-    result = brightness_gamma;
+    result = chromaticity .* repmat(brightness_gamma, [1 1 3]);
 end

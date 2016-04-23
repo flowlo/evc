@@ -8,110 +8,98 @@ function [result,fnc_demosaic_pattern,fnc_transform_neutral,fnc_interpolate,fnc_
 % Sie ruft in der richtigen Reihenfolge die zu implementierenden Funktionen auf.
 % ACHTUNG: Diese Funktion darf nicht verändert werden!
     
-    fnc_demosaic_pattern    = @(input)                  evc_demosaic_pattern(input);
-    fnc_transform_neutral   = @(R,G,B,asShotNeutral)    evc_transform_neutral(R,G,B,asShotNeutral);
-    fnc_interpolate         = @(R,G,B)                  evc_interpolate(R,G,B);
-    fnc_concat              = @(R,G,B)                  evc_concat(R,G,B);
+    fnc_demosaic_pattern  = @(input) evc_demosaic_pattern(input);
+    fnc_transform_neutral = @(R,G,B,asShotNeutral) evc_transform_neutral(R,G,B,asShotNeutral);
+    fnc_interpolate       = @(R,G,B) evc_interpolate(R,G,B);
+    fnc_concat            = @(R,G,B) evc_concat(R,G,B);
     
-    [R,G,B]  = evc_demosaic_pattern(input);
-    [R,G,B]  = evc_transform_neutral(R,G,B,asShotNeutral);
-    [R,G,B]  = evc_interpolate(R,G,B);
-    result   = evc_concat(R,G,B);
+    [R,G,B] = evc_demosaic_pattern(input);
+    [R,G,B] = evc_transform_neutral(R,G,B,asShotNeutral);
+    [R,G,B] = evc_interpolate(R,G,B);
+    result  = evc_concat(R,G,B);
 end
 
 
 function [R,G,B] = evc_demosaic_pattern(input)
-%evc_demosaic_pattern extrahiert den Rot-, Grün- und Blaukanal aus dem
+% evc_demosaic_pattern extrahiert den Rot-, Grün- und Blaukanal aus dem
 % Bild(input) und gibt sie in den Variablen R,G,B zurück. Dabei werden die
 % Lücken in den Kanälen noch nicht gefüllt. 
 %
 %   EINGABE
-%   input...            Das Bayer-Pattern-Bild
+%   input  Das Bayer-Pattern-Bild
 %
 %   AUSGABE
-%   R...                Der Rot-Kanal des Bildes (mit Lücken)
-%   G...                Der Grün-Kanal des Bildes (mit Lücken)
-%   B...                Der Blau-Kanal des Bildes (mit Lücken)
+%   R  Der Rot-Kanal des Bildes (mit Lücken)
+%   G  Der Grün-Kanal des Bildes (mit Lücken)
+%   B  Der Blau-Kanal des Bildes (mit Lücken)
 
-	%HINT: 	Dazu eignet sich gut die "start:skip:end" Selektion.
-	%       Finde aufgrund deines Datensatzes das richtige Bayer-Pattern.
-	%NOTE: 	Die folgenden drei Zeilen können gelöscht werden. Sie
-	%		verhindern, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-    
-    R = zeros(size(input));
-    G = zeros(size(input));
-    B = zeros(size(input));
+    R = zeros(size(input))
+    G = zeros(size(input))
+    B = zeros(size(input))
+
+    G(1:2:end, 1:2:end) = input(1:2:end, 1:2:end);
+    R(1:2:end, 2:2:end) = input(1:2:end, 2:2:end);
+    B(2:2:end, 1:2:end) = input(2:2:end, 1:2:end);
+    G(2:2:end, 2:2:end) = input(2:2:end, 2:2:end);
 end
 
 function [R,G,B] = evc_transform_neutral(R,G,B,asShotNeutral)
-%evc_transform_neutral passt den Rot-, Grün- und Blaukanal an den neutralen
-% Weißwert(asShotNeutral) an. Dazu wird jeder Kanal durch den
-% entsprechenden Kanal des Weißwertes dividiert.
+% evc_transform_neutral passt den Rot-, Grün- und Blaukanal
+% an den neutralen Weißwert(asShotNeutral) an. Dazu wird jeder
+% Kanal durch den entsprechenden Kanal des Weißwertes dividiert.
 %
 %   EINGABE
-%   R...                Der Rot-Kanal des Bildes
-%   G...                Der Grün-Kanal des Bildes
-%   B...                Der Blau-Kanal des Bildes
+%   R  Der Rot-Kanal des Bildes
+%   G  Der Grün-Kanal des Bildes
+%   B  Der Blau-Kanal des Bildes
 %
 %   AUSGABE
-%   R...                Der Rot-Kanal des Bildes (angepasst an neutralen Weißwert)
-%   G...                Der Grün-Kanal des Bildes (angepasst an neutralen Weißwert)
-%   B...                Der Blau-Kanal des Bildes (angepasst an neutralen Weißwert)
+%   R  Der Rot-Kanal des Bildes (angepasst an neutralen Weißwert)
+%   G  Der Grün-Kanal des Bildes (angepasst an neutralen Weißwert)
+%   B  Der Blau-Kanal des Bildes (angepasst an neutralen Weißwert)
 
-	%NOTE: 	Die folgenden drei Zeilen können gelöscht werden. Sie
-	%		verhindern, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-
-    R = zeros(size(R));
-    G = zeros(size(G));
-    B = zeros(size(B));
+    R = R / asShotNeutral(1);
+    G = G / asShotNeutral(2);
+    B = B / asShotNeutral(3);
 end
 
 function [R,G,B] = evc_interpolate(R,G,B)
-%evc_interpolate interpoliert den Rot-, Grün- und Blaukanal so, dass die
-% Lücken ausgefüllt werden.
+% evc_interpolate interpoliert den Rot-, Grün- und Blaukanal
+% so, dass die Lücken ausgefüllt werden.
 %
 %   EINGABE
-%   R...                Der Rot-Kanal des Bildes
-%   G...                Der Grün-Kanal des Bildes
-%   B...                Der Blau-Kanal des Bildes
+%   R  Der Rot-Kanal des Bildes
+%   G  Der Grün-Kanal des Bildes
+%   B  Der Blau-Kanal des Bildes
 %
 %   AUSGABE
-%   R...                Der Rot-Kanal des Bildes (ohne Lücken)
-%   G...                Der Grün-Kanal des Bildes (ohne Lücken)
-%   B...                Der Blau-Kanal des Bildes (ohne Lücken)
+%   R  Der Rot-Kanal des Bildes (ohne Lücken)
+%   G  Der Grün-Kanal des Bildes (ohne Lücken)
+%   B  Der Blau-Kanal des Bildes (ohne Lücken)
 
-	%HINT: 	Die Funktion imfilter kann helfen.
-	%NOTE: 	Die folgenden drei Zeilen können gelöscht werden. Sie
-	%		verhindern, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
+    G = imfilter(G, [ 0.00 0.25 0.00 ;
+                      0.25 1.00 0.25 ;
+                      0.00 0.25 0.00 ], 'replicate');
 
-    R = zeros(size(R));
-    G = zeros(size(G));
-    B = zeros(size(B));
+    f =  [ 0.25, 0.50, 0.25 ;
+           0.50, 1.00, 0.50 ;
+           0.25, 0.50, 0.25 ];
+
+    B = imfilter(B, f, 'replicate');
+    R = imfilter(R, f, 'replicate');
 end
 
 function [result] = evc_concat(R,G,B)
-%evc_interpolate verbindet den Rot-, Grün- und Blaukanal zu einem
-% Bild.
+% evc_interpolate verbindet den Rot-, Grün- und Blaukanal
+% zu einem Bild.
 %
 %   EINGABE
-%   R...                Der Rot-Kanal des Bildes
-%   G...                Der Grün-Kanal des Bildes
-%   B...                Der Blau-Kanal des Bildes
+%   R  Der Rot-Kanal des Bildes
+%   G  Der Grün-Kanal des Bildes
+%   B  Der Blau-Kanal des Bildes
 %
 %   AUSGABE
-%   result...           Das Bild
+%   result  Das Bild
 
-	%HINT: 	Die Funktion cat kann helfen.
-	%NOTE: 	Die folgende Zeile kann gelöscht werden. Sie
-	%		verhindert, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-
-    result = zeros([size(R,1),size(R,2),3]);
+    result = cat(3, R, G, B);
 end
