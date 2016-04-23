@@ -118,7 +118,7 @@ function [result] = evc_filter(input, kernel)
 
     for i = l + 1:s(1) - l - 1
         for j = l + 1:s(2) - l - 1
-            sum = zeros(3);
+            sum = [ 0 0 0 ];
             for a = 1:k
                 for b = 1:k
                     for chan = 1:3
