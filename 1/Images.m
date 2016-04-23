@@ -15,24 +15,30 @@ image_masked = [];
 image_reshaped = [];
 image_edge = [];
 
-
 %% I. Images basics
 % 1) Load image from 'input_path'
-%TODO: Add your code here
+
+lena = imread(input_path);
 
 % 2) Convert the image from 1) to double format with range [0, 1]. DO NOT USE LOOPS.
-%TODO: Add your code here
+
+lena = im2double(lena);
 
 % 3) Use the image from 2) to create an image where the red and the blue channel
 % are swapped. The result should be stored in image_swapped. DO NOT USE LOOPS.
-%TODO: Add your code here
+
+image_swapped(:, :, 1) = lena(:, :, 3);
+image_swapped(:, :, 2) = lena(:, :, 2);
+image_swapped(:, :, 3) = lena(:, :, 1);
 
 % 4) Display the swapped image
-%TODO: Add your code here
+
+figure, imshow(image_swapped);
 
 % 5) Write the swapped image to the path specified in output_path. The
 % image should be in png format.
-%TODO: Add your code here
+
+imwrite(lena, output_path, 'png');
 
 % 6) Create logical image where every pixel is marked that has a green channel
 % which is greater or equal 0.5. The result should be stored in image_mark_green. 
@@ -41,13 +47,15 @@ image_edge = [];
 % HINT:
 % see http://de.mathworks.com/help/matlab/matlab_prog/find-array-elements-that-meet-a-condition.html).
 
-%TODO: Add your code here
+image_mark_green = lena(:,:,2);
+image_mark_green = im2bw(image_mark_green, 0.5);
+image_mark_green = ~image_mark_green;
 
 % 7) Set all pixels in the original image (the double image from step 2) to black where image_mark_green is
 % true (where green >= 0.5). Store the result in image_masked. 
 % Use repmat to complete this task. DO NOT USE LOOPS. 
 
-%TODO: Add your code here
+image_masked = lena .* repmat(image_mark_green, [1 1 3]);
 
 % 8) Convert the original image (the double image from step 2) to a grayscale image and reshape it from
 % 512x512 to 256x1024. Cut off the right half of the image and attach it to the bottom of the left half.
@@ -55,13 +63,15 @@ image_edge = [];
 % (Hint: Matlab adresses matrices with "height x width". 
 % 	     The dimensions in the instructions refer to the human-readable form "width x height".
 %		 If this is not clear, take a look at the resulting image in the online-instructions.)
-%TODO: Add your code here
+
+image_reshaped = rgb2gray(lena);
+image_reshaped = vertcat(image_reshaped(:,1:256), image_reshaped(:,257:512));
 
 %% II. Filters and convolutions
 
 % 1) Use fspecial to create a 5x5 gaussian filter with sigma=2.0
-%TODO: Delete the next line and add your code here
-gauss_kernel = [0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0; 0, 0, 0, 0, 0];
+
+gauss_kernel = fspecial('gaussian', [5, 5], 2);
 
 % 2) Implement the evc_filter function. You are allowed to use loops for
 % this task. You can assume that the kernel is always of size 5x5.
@@ -78,7 +88,10 @@ image_convoluted = evc_filter(image_swapped, gauss_kernel);
 % The output image should have the same size as the input image.
 % For this task it is your choice how you handle pixels outside the
 % image, but you should use a typical method to do this.
-%TODO: Add your code here
+
+image_edge = imfilter(image_reshaped, [ -1,  -2, -1;
+                                         0,   0,  0;
+                                         1,   2,  1], 'replicate');
 
 end
 
@@ -86,8 +99,34 @@ end
 % input: An rgb-image
 % kernel: The filter kernel
 function [result] = evc_filter(input, kernel)
+    s = size(input);
+    k = size(kernel, 1);
+    l = floor(k / 2);
 
-    %TODO: Add your code here
-    result = input;
+    % generate empty "image"/matrix with same dimensions as input
+    result = zeros(s);
 
+    % increase height and width to make room for padding
+    s(1) = s(1) + k - 1;
+    s(2) = s(2) + k - 1;
+
+    % an empty "image" that has a border so it is bigger than the input
+    tmp = zeros(s);
+
+    % paste the input into tmp, so that the border is around input
+    tmp(l + 1:s(1) - l, l + 1:s(2) - l, :) = input(:, :, :);
+
+    for i = l + 1:s(1) - l - 1
+        for j = l + 1:s(2) - l - 1
+            sum = zeros(3);
+            for a = 1:k
+                for b = 1:k
+                    for chan = 1:3
+                        sum(chan) = sum(chan) + tmp(i - l + a, j - l + b, chan) * kernel(a, b);
+                    end
+                end
+            end
+            result(i - l, j - l, :) = sum(:);
+        end
+    end
 end
