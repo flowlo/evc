@@ -31,9 +31,17 @@ function[v1, v2, v3, M, M_9x15, v_M_Product, M_v_Product, M_M_Product, M_M_compo
 %      F     D     B
 %      E     C     A
 
-v1 = 0; % TODO: edit this
-v2 = 0; % TODO: edit this
-M = 0; % TODO: edit this
+A = 1;
+B = 1;
+C = 2;
+D = 7;
+E = 8;
+F = 4;
+G = 2;
+
+v1 = [ F B E ];
+v2 = [ G ; C ; D ];
+M = [ C B G ; F D B ; E C A ];
 
 % 2) create a sequence: create a Vector 'v3' with elements starting at the
 % largest digit of M to the smallest, each element 0.5 less than the one
@@ -47,7 +55,7 @@ M = 0; % TODO: edit this
 % all other Matlab functions), type (in the matlab commandline):
 % help :
 
-v3 = 0; % TODO: edit this
+v3 = max(M(:)):0.5:min(M(:));
 
 % 3) create a 9-by-15 Matrix 'M_9x15' containing a checkerboard pattern of 
 % tiles where each black tile contains the contents of matrix M and 
@@ -65,7 +73,12 @@ v3 = 0; % TODO: edit this
 % and have a look at the zeros-command:
 % help zeros
 
-M_9x15 = 0; % TODO: edit this
+Z3 = zeros(3, 3);
+
+CODD = horzcat(M, Z3, M, Z3, M);
+CEVEN = horzcat(Z3, M, Z3, M, Z3);
+
+M_9x15 = vertcat(CODD, CEVEN, CODD);
 
 %% II. implement your own versions of the following built-in Matlab functions:
 % *, .*, cross, dot
@@ -100,67 +113,81 @@ crossP = crossProduct(v1,v2);
 % 6) dot product (use v1 and v2)
 dotP = dotProduct(v1,v2);
 
-
 end
 
 function[result] = vector_X_Matrix(v1, M)
 
-% return a row vector
+% precondition: size(M, 2) == size(v1)
 
-% TODO: your code goes here
-result = 0; % TODO: edit this
+    result = zeros(1, size(M, 2));
 
+    for i = 1:size(M, 2)
+        for j = 1:size(M, 1)
+            result(i) = result(i) + M(j, i) * v1(j);
+        end
+    end
 end
 
 function[result] = Matrix_X_vector(M, v2)
 
-%return a column vector
+% precondition: size(M, 2) == size(v2)
 
-% TODO: your code goes here
-result = 0; % TODO: edit this
+    result = zeros(size(M, 1), 1);
 
+    for i = 1:size(M, 1)
+        for j = 1:size(M, 2)
+            result(i) = result(i) + M(i, j) * v2(j);
+        end
+    end
 end
 
 function[result] = Matrix_X_Matrix(M, M2)
 
-% hint: row times column!
+% precondition: size(M) == size(M2)
+% precondition: size(M, 1) == size(M, 2)
 
-% TODO: your code goes here
-result = 0; % TODO: edit this
+    result = zeros(size(M));
 
+    for i = 1:size(M, 2)
+        for j = 1:size(M, 1)
+            for k = 1:size(M, 2)
+                result(i, j) = result(i, j) + M(i, k) * M2(k, j);
+            end
+        end
+    end
 end
 
 function[result] = Matrix_Xc_Matrix(M, M2)
 
-% implement component wise multiplication
+% precondition: size(M) == size(M2)
 
-% TODO: your code goes here
-result = 0; % TODO: edit this
+    result = zeros(size(M));
 
+    for i = 1:size(M, 1)
+        for j = 1:size(M, 2)
+            result(i, j) = M(i, j) * M2(i, j);
+        end
+    end
 end
 
-function[result] = crossProduct(v1,v2)
+function[result] = crossProduct(v1, v2)
 
-% IMPORTANT: DON'T use the built-in Matlab function 'cross' to do this!!!
-% implement it yourself and then compare it with 'cross'
+% precondition: length(v1) == 3
+% precondition: length(v2) == 3
 
-% return a row vector
-
-% TODO: your code goes here
-result = 0; % TODO: edit this
-
+    result = reshape([
+        v1(2) * v2(3) - v1(3) * v2(2)
+        v1(3) * v2(1) - v1(1) * v2(3)
+        v1(1) * v2(2) - v1(2) * v2(1)
+    ], 1, []);
 end
 
-function[result] = dotProduct(v1,v2)
+function[result] = dotProduct(v1, v2)
 
-% IMPORTANT: DON'T use the built in Matlab function 'dot' to do this!!!
-% implement it yourself and then compare it with 'dot'
+% precondition: length(v1) == length(v2)
 
-% TODO: your code goes here
-result = 0; % TODO: edit this
-
+    result = 0;
+    for i = 1:length(v1)
+        result = result + v1(i) * v2(i);
+    end
 end
-
-
-
-
