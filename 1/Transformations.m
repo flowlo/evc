@@ -30,7 +30,6 @@ display_vertices(quad, 11, 'Original Quad');
 rotated_vertices = transform_vertices(quad, matrix_rotate);
 display_vertices(rotated_vertices, 12, 'Rotated Quad');
 
-
 image1_vertices = quad;
 image2_vertices = quad;
 image3_vertices = quad;
@@ -40,44 +39,51 @@ image4_vertices = quad;
 % the Target Images 1-4 (see submission system) and display them.
 % Please recall that you are supposed to call the transform_vertices function only once per image. 
 
-image1_vertices = image1_vertices;
-image2_vertices = image2_vertices;
-image3_vertices = image3_vertices;
-image4_vertices = image4_vertices;
+image1_vertices = transform_vertices(image1_vertices, mtranslate(-2, 0) * mrotate(30));
+image2_vertices = transform_vertices(image2_vertices, mrotate(30) * mtranslate(-2, 0));
+image3_vertices = transform_vertices(image3_vertices, ...
+      mtranslate(2, 1)  ...
+    * mrotate(-10)      ...
+    * mtranslate(-3, 0) ... move s.t. corner at [0 0] for rotation
+    * mscale(3, 2)      ... scale for correct length
+);
 
-display_vertices(image1_vertices, 13, 'Target Image 1');
-display_vertices(image2_vertices, 14, 'Target Image 2');
-display_vertices(image3_vertices, 15, 'Target Image 3');
+theta = 60;
+
+image4_vertices = transform_vertices(image4_vertices, ... 
+        mscale(1, 3) ...
+      * mrotate(45)  ...
+);
+
+%display_vertices(image1_vertices, 13, 'Target Image 1');
+%display_vertices(image2_vertices, 14, 'Target Image 2');
+%display_vertices(image3_vertices, 15, 'Target Image 3');
 display_vertices(image4_vertices, 16, 'Target Image 4');
-
 
 end
 
 % Returns a 3x3 translation matrix
 % tx, ty: translation along x and y
 function[matrix] =  mtranslate(tx, ty)
-
-    % TODO: Implement this function
-    matrix = [];
-
+    matrix = [ 1 0 tx ;
+               0 1 ty ;
+               0 0 1  ];
 end
 
 % Returns a 3x3 counter-clockwise rotation matrix
 % angle: rotation angle in degrees
 function[matrix] = mrotate(angle)
-
-    % TODO: Implement this function
-    matrix = [];
-
+    matrix = [ cosd(angle) -sind(angle) 0 ;
+               sind(angle)  cosd(angle) 0 ;
+               0            0           1 ];
 end
 
 % Returns a 3x3 scaling matrix
 % sx, sy: scaling in x and y direction
 function[matrix] = mscale(sx, sy)
-
-    % TODO: Implement this function
-    matrix = [];
-
+    matrix = [ sx 0  0 ;
+               0  sy 0 ;
+               0  0  1 ];
 end
 
 %Displays a list of vertices
@@ -85,26 +91,28 @@ end
 %id: figure id
 %head: title of the figure
 function[] = display_vertices(v, id, head)
+    % Create new figure
+    figure(id);
+    clf;
 
-%Create new figure
-figure(id);
-clf;
-%Set title
-title(head);
-%Fix axis and set aspect ratio
-axis([-5, 5, -5, 5]);
-pbaspect([1 1 1]);
+    % Set title
+    title(head);
 
-%Plot coordinate axis
-hold on;
-plot([-100, 100], [0, 0], '-g');
-plot([0, 0], [-100, 100], '-g');
+    % Fix axis and set aspect ratio
+    axis([-5, 5, -5, 5]);
+    pbaspect([1 1 1]);
 
-% TODO: Display the vertices (v) using the plot function
+    % Plot coordinate axis
+    hold on;
+    plot([-100, 100], [0, 0], '-g');
+    plot([0, 0], [-100, 100], '-g');
 
-%Finish drawing
-hold off;
+    for i = 1:size(v, 2) - 1
+        plot(v(1, i:i+1), v(2, i:i+1), '-b');
+    end
 
+    % Finish drawing
+    hold off;
 end
 
 % Transforms a list of vertices by a matrix
@@ -112,8 +120,5 @@ end
 % m: transformation matrix
 % Returns a list of transformed vertices of the same size as v
 function[result] = transform_vertices(v, m)
-
-    % TODO: Implement this function
-    result = v;
-
+    result = m * v;
 end
