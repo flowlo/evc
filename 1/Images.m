@@ -101,32 +101,26 @@ end
 function [result] = evc_filter(input, kernel)
     s = size(input);
     k = size(kernel, 1);
-    l = floor(k / 2);
+    l = floor(k / 2) + 1
 
-    % generate empty "image"/matrix with same dimensions as input
     result = zeros(s);
 
-    % increase height and width to make room for padding
-    s(1) = s(1) + k - 1;
-    s(2) = s(2) + k - 1;
-
-    % an empty "image" that has a border so it is bigger than the input
-    tmp = zeros(s);
-
-    % paste the input into tmp, so that the border is around input
-    tmp(l + 1:s(1) - l, l + 1:s(2) - l, :) = input(:, :, :);
-
-    for i = l + 1:s(1) - l - 1
-        for j = l + 1:s(2) - l - 1
-            sum = [ 0 0 0 ];
-            for a = 1:k
-                for b = 1:k
-                    for chan = 1:3
-                        sum(chan) = sum(chan) + tmp(i - l + a, j - l + b, chan) * kernel(a, b);
+    for x = 1:s(1)
+        for y = 1:s(2)
+            tmp = [0 0 0];
+            for i = 1:k
+                for j = 1:k
+                    if (x - l + i < 1) | (x - l + i > s(1))
+                        continue;
+                    elseif (y - l + j < 1) | (y - l + j > s(2))
+                        continue;
+                    end
+                    for c = 1:3
+                        tmp(c) = tmp(c) + input(x - 3 + i, y - 3 + j, c) * kernel(i, j);
                     end
                 end
             end
-            result(i - l, j - l, :) = sum(:);
+            result(x, y, :) = tmp(:);
         end
     end
 end
