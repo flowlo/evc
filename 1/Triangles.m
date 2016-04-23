@@ -26,18 +26,26 @@ function[P1P2_saved, P2P3_saved, P3P1_saved, Normal_normalized, P1P2_length, P2P
 % Where A,B,C,D,E,F,G are digits of your matriculation number in the following order:
 % matriculation number: 'ABCDEFG'
 
-P1 = 0; % TODO: edit this
-P2 = 0; % TODO: edit this
-P3 = 0; % TODO: edit this
+A = 1;
+B = 1;
+C = 2;
+D = 7;
+E = 8;
+F = 4;
+G = 2;
+
+P1 = [ 1 + G, -(1 + B), -(1 + C) ];
+P2 = [ -(1 + E), -(1 + A), 1 + F ];
+P3 = [ -(1 + D), 1 + C, -(1 + B) ];
 
 %% 2) Construct the 3 vectors of the triangle: P1P2, P2P3 and P3P1
 % P1P2 is pointing from P1 to P2
 % P2P3 is pointing from P2 to P3
 % P3P1 is pointing from P3 to P1
 
-P1P2 = 0; % TODO: edit this
-P2P3 = 0; % TODO: edit this
-P3P1 = 0; % TODO: edit this
+P1P2 = P2 - P1;
+P2P3 = P3 - P2;
+P3P1 = P3 - P1;
 
 % your results are saved for later evaluation:
 P1P2_saved = P1P2; % DON'T OVERRIDE P1P2_saved !!!
@@ -51,24 +59,24 @@ P3P1_saved = P3P1; % DON'T OVERRIDE P3P1_saved !!!
 % but you can compare the results of your calculation with the results you
 % get by using the built-in Matlab function 'norm'.
 
-P1P2_length = 0; % TODO: edit this
-P2P3_length = 0; % TODO: edit this
-P3P1_length = 0; % TODO: edit this
+P1P2_length = sqrt(P1P2(1) ^ 2 + P1P2(2) ^ 2 + P1P2(3) ^ 2);
+P2P3_length = sqrt(P2P3(1) ^ 2 + P2P3(2) ^ 2 + P2P3(3) ^ 2);
+P3P1_length = sqrt(P3P1(1) ^ 2 + P3P1(2) ^ 2 + P3P1(3) ^ 2);
 
 %% 4) Compute the face normal of the triangle
 % You can use the functions from MatlabBasics.m
 % equivalents(e.g. cross, dot, norm, etc.).
 % normalize the normal!
 
-Normal = 0; % TODO: edit this
-Normal_normalized = 0; % TODO: normalize it!
+Normal = cross(P1P2, P2P3);
+Normal_normalized = [ Normal(1) / norm(Normal) Normal(2) / norm(Normal) Normal(3) / norm(Normal) ];
 
 %% 5) Compute the Area of your triangle
 % You can use functions you have programmed until now or their Matlab
 % equivalents(e.g. cross, dot, norm, etc.).
 % Beware of the direction of your vectors!
 
-Area = 0; % TODO: edit this
+rea = norm(cross(P1P2, P2P3)) / 2;
 
 %% 6) Calculate the 3 angles of your triangle (in degrees)
 % Name them 'alpha' at P1, 'beta' at P2 and 'gamma' at P3
@@ -82,16 +90,16 @@ Area = 0; % TODO: edit this
 % Save the arithmetic mean of the three angles to 'angles_avg' (Check the
 % command 'mean)
 
-alpha = 0; % TODO: edit this
-beta = 0; % TODO: edit this
-gamma = 0; % TODO: edit this
+alpha = acosd(dot(P1P2, -P3P1) / (norm(P1P2) * norm(P3P1)));
+beta = acosd(dot(-P1P2, P2P3) / (norm(P1P2) * norm(P2P3)));
+gamma = acosd(dot(-P2P3, P3P1) / (norm(P2P3) * norm(P3P1)));
+
+angles = [alpha, beta, gamma];
 
 % check the sum
-angles_sum = 0; % TODO: edit this
-angles_max = 0; % TODO: edit this
-angles_min = 0; % TODO: edit this
-angles_avg = 0; % TODO: edit this
-
-
+angles_sum = sum(angles);
+angles_max = max(angles);
+angles_min = min(angles);
+angles_avg = mean(angles);
 
 end
