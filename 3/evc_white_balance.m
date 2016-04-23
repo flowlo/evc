@@ -13,10 +13,8 @@ function [result] = evc_white_balance(input, white)
 %   AUSGABE
 %   result  Ergebnis nach dem Weiﬂabgleich
 
-% TODO Catch divison by zero!
-
     result = zeros(size(input));
-    result(:,:,1) = input(:,:,1) / white(1);
-    result(:,:,2) = input(:,:,2) / white(2);
-    result(:,:,3) = input(:,:,3) / white(3);
+    result(:,:,1) = input(:,:,1) / max(white(1), 0.00001);
+    result(:,:,2) = input(:,:,2) / max(white(2), 0.00001);
+    result(:,:,3) = input(:,:,3) / max(white(3), 0.00001);
 end
