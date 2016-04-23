@@ -43,9 +43,9 @@ P3 = [ -(1 + D), 1 + C, -(1 + B) ];
 % P2P3 is pointing from P2 to P3
 % P3P1 is pointing from P3 to P1
 
-P1P2 = P2 - P1;
+P1P2 = P1 - P2;
 P2P3 = P3 - P2;
-P3P1 = P3 - P1;
+P3P1 = P1 - P3;
 
 % your results are saved for later evaluation:
 P1P2_saved = P1P2; % DON'T OVERRIDE P1P2_saved !!!
@@ -69,14 +69,14 @@ P3P1_length = sqrt(P3P1(1) ^ 2 + P3P1(2) ^ 2 + P3P1(3) ^ 2);
 % normalize the normal!
 
 Normal = cross(P1P2, P2P3);
-Normal_normalized = [ Normal(1) / norm(Normal) Normal(2) / norm(Normal) Normal(3) / norm(Normal) ];
+Normal_normalized = Normal ./ norm(Normal);
 
 %% 5) Compute the Area of your triangle
 % You can use functions you have programmed until now or their Matlab
 % equivalents(e.g. cross, dot, norm, etc.).
 % Beware of the direction of your vectors!
 
-rea = norm(cross(P1P2, P2P3)) / 2;
+Area = norm(cross(-P1P2, P2P3)) / 2;
 
 %% 6) Calculate the 3 angles of your triangle (in degrees)
 % Name them 'alpha' at P1, 'beta' at P2 and 'gamma' at P3
