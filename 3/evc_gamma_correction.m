@@ -1,8 +1,3 @@
-%
-% Copyright 2016 Vienna University of Technology.
-% Institute of Computer Graphics and Algorithms.
-%
-
 function [result, fnc_compute_brightness, fnc_compute_chromaticity, fnc_gamma_correct, fnc_reconstruct] = evc_gamma_correction(input, gamma, saturate)
 % Diese Funktion ist die Hauptfunktion.
 % Sie ruft in der richtigen Reihenfolge die zu implementierenden Funktionen auf.

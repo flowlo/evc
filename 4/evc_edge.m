@@ -1,13 +1,4 @@
-%
-% Copyright 2016 Vienna University of Technology.
-% Institute of Computer Graphics and Algorithms.
-%
-
-function [result,fnc_detect_edges,fnc_maximum_edge,fnc_blur_edges,fnc_strengthen_edges,fnc_blend_edges] = evc_edge(color, normals, sigma, edgeColor, edgeStrength)       
-% Diese Funktion ist die Hauptfunktion.
-% Sie ruft in der richtigen Reihenfolge die zu implementierenden Funktionen auf.
-% ACHTUNG: Diese Funktion darf nicht verändert werden!
-    
+function [result,fnc_detect_edges,fnc_maximum_edge,fnc_blur_edges,fnc_strengthen_edges,fnc_blend_edges] = evc_edge(color, normals, sigma, edgeColor, edgeStrength)
     fnc_detect_edges            = @(normals)                        evc_detect_edges    (normals);
     fnc_maximum_edge            = @(edgesXyz)                       evc_maximum_edge    (edgesXyz);
     fnc_blur_edges              = @(edgesGray,sigma)                evc_blur_edges      (edgesGray,sigma);
@@ -22,67 +13,51 @@ function [result,fnc_detect_edges,fnc_maximum_edge,fnc_blur_edges,fnc_strengthen
 end
 
 function [edgesXyz] = evc_detect_edges(normals)
-%evc_detect_edges erkennt Kanten in einem Normalen-Bild. Dazu wird ein
+% evc_detect_edges erkennt Kanten in einem Normalen-Bild. Dazu wird ein
 % Laplace-Filter verwendet, der horizontale, vertikale und diagonale Kanten
 % erkennt. Im Anschluss wird der Absolutbetrag vom gefilterten Bild
 % berechnet und zurückgegeben.
 %
 %   EINGABE
-%   normals...          Ein Normalen-Bild (3-Kanal, mit X,Y,Z als Kanäle)
+%   normals   Ein Normalen-Bild (3-Kanal, mit X, Y, Z als Kanäle)
 %
 %   AUSGABE
-%   edgesXyz...         Ein 3-Kanal-Bild mit der Stärke der Kante pro
-%                       Achse, pro Pixel
+%   edgesXyz  Ein 3-Kanal-Bild mit der Stärke der Kante pro Achse, pro Pixel.
 
-	%HINT:  Hiflreiche Funktion: imfilter
-	%NOTE: 	Die folgende Zeile kann gelöscht werden. Sie
-	%		verhindert, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-    
-    edgesXyz = zeros(size(normals));
+    f = [1  1 1;
+         1 -8 1;
+         1  1 1];
+
+    edgesXyz = abs(imfilter(normals, f .* 0.125));
 end
 
 function [edgesGray] = evc_maximum_edge(edgesXyz)
-%evc_maximum_edge berechnet die Stärke der Kante pro Pixel als das Maximum
+% evc_maximum_edge berechnet die Stärke der Kante pro Pixel als das Maximum
 % der Kanstenstärke aller Achsen pro Pixel.
 %
 %   EINGABE
-%   edgesXyz...         Ein 3-Kanal-Bild mit der Stärke pro Achse, pro
-%                       Kante
+%   edgesXyz   Ein 3-Kanal-Bild mit der Stärke pro Achse, pro Kante
 %
 %   AUSGABE
-%   edgesGray...        Ein 1-Kanal-Bild mit der Stärke der Kante pro Pixel
+%   edgesGray  Ein 1-Kanal-Bild mit der Stärke der Kante pro Pixel
 
-	%HINT: 	Hilfreiche Funktionen: max
-	%NOTE: 	Die folgende Zeile kann gelöscht werden. Sie
-	%		verhindert, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-    
-    edgesGray = zeros(size(edgesXyz,1),size(edgesXyz,2));
+    edgesGray = max(edgesXyz, [], 3);
 end
 
 function [edgesBlurred] = evc_blur_edges(edgesGray,sigma)
-%evc_blur_edges filtert das übergebene Kantenbild entsprechend einem 16x16
+% evc_blur_edges filtert das übergebene Kantenbild entsprechend einem 16x16
 % Gauss-Filter, der das angegebene Sigma verwendet. Dazu wird das Bild mit dem
 % entsprechenden 1x16 Gauss-Filter, und dann mit dem entsprechenden 16x1
 % Gauss-Filter gefiltert.
 %
 %   EINGABE
-%   edgesGray...        Ein 1-Kanal-Bild mit der Stärke der Kante pro Pixel
-%   sigma...            Das Sigma für den Gauss-Filter
+%   edgesGray     Ein 1-Kanal-Bild mit der Stärke der Kante pro Pixel
+%   sigma         Das Sigma für den Gauss-Filter
 %
 %   AUSGABE
-%   edgesBlurred...     Ein 1-Kanal-Bild mit der gefilterten Kante pro
-%                       Pixel
+%   edgesBlurred  Ein 1-Kanal-Bild mit der gefilterten Kante pro Pixel
 
-	%HINT: 	Hilfreiche Funktionen: fspecial, imfilter
-	%NOTE: 	Die folgende Zeile kann gelöscht werden. Sie
-	%		verhindert, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-    edgesBlurred =  edgesGray;    
+    edgesBlurred = imfilter(edgesGray, fspecial('gaussian', [16 16], sigma));
 end
 
 function [edgeFactor] = evc_strengthen_edges(edgesBlurred,edgeStrength)
@@ -94,20 +69,15 @@ function [edgeFactor] = evc_strengthen_edges(edgesBlurred,edgeStrength)
 % gleiche Wert gespeichert ist.
 %
 %   EINGABE
-%   edgesBlurred...     Ein 1-Kanal-Bild mit der Stärke der Kante pro
+%   edgesBlurred  Ein 1-Kanal-Bild mit der Stärke der Kante pro
 %                       Pixel.
-%   edgeStrength...     Der Faktor, der zum stärken der Kanten verwendet
-%                       wird.
+%   edgeStrength  Der Faktor, der zum stärken der Kanten verwendet wird.
 %
 %   AUSGABE
-%   edgeFactor...       Ein 3-Kanal-Bild mit der Stärke der Kante pro Pixel.
+%   edgeFactor    Ein 3-Kanal-Bild mit der Stärke der Kante pro Pixel.
 
-	%NOTE: 	Die folgende Zeile kann gelöscht werden. Sie
-	%		verhindert, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-    
-    edgeFactor = zeros([size(edgesBlurred), 3]);
+    edgeFactor = repmat(edgesBlurred .* edgeStrength, [1 1 3]);
+    edgeFactor(edgeFactor > 1) = 1;
 end
 
 function [result] = evc_blend_edges(color, edgeColor, edgeFactor)
@@ -118,18 +88,13 @@ function [result] = evc_blend_edges(color, edgeColor, edgeFactor)
 % sichtbar sein. Die Werte zwischen 0 und 1 sollen linear interpoliert werden.
 %
 %   EINGABE
-%   color...            Ein 3-Kanal-Farbbild
-%   edgeColor...        Ein 3-Kanal-Bild in der Größe von color, das nur
-%                       die Kantenfarbe enthält.
-%   edgeFactor...       Der Interpolations-Parameter.
+%   color       Ein 3-Kanal-Farbbild
+%   edgeColor   Ein 3-Kanal-Bild in der Größe von color, das nur die Kantenfarbe
+%               enthält.
+%   edgeFactor  Der Interpolations-Parameter.
 %
 %   AUSGABE
-%   result...           Das interpolierte Bild.
+%   result      Das interpolierte Bild.
 
-	%NOTE: 	Die folgende Zeile kann gelöscht werden. Sie
-	%		verhindert, dass die Funktion, solange sie nicht implementiert wurde,
-	%		abstürzt.
-	%TODO:  Implementiere diese Funktion.
-    
-    result = color;
+    result = edgeColor .* edgeFactor + color .* (1 - edgeFactor);
 end
